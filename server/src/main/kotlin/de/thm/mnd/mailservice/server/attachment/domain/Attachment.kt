@@ -1,6 +1,6 @@
 package de.thm.mnd.mailservice.server.attachment.domain
 
-import de.thm.mnd.mailservice.server.mails.domain.Mail
+import de.thm.mnd.mailservice.server.mail.domain.Mail
 import jakarta.persistence.*
 import java.util.UUID
 

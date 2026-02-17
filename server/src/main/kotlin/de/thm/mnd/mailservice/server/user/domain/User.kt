@@ -11,7 +11,10 @@ class User(
     val id: UUID? = null,
 
     @Column(nullable = false)
-    var name: String = "",
+    var first_name: String = "",
+
+    @Column(nullable = false)
+    var last_name: String = "",
 
     @Column(unique = true, nullable = false)
     var email: String = "",

@@ -1,8 +1,10 @@
-package de.thm.mnd.mailservice.server.mails.domain
+package de.thm.mnd.mailservice.server.mail.domain
 
 
 import de.thm.mnd.mailservice.server.user.domain.User
 import de.thm.mnd.mailservice.server.attachment.domain.Attachment
+import de.thm.mnd.mailservice.server.shared.MailStatus
+import de.thm.mnd.mailservice.server.shared.MailSource
 import jakarta.persistence.*
 import java.time.LocalDateTime
 import java.util.UUID
@@ -21,20 +23,17 @@ class Mail(
     @Column(columnDefinition = "TEXT", nullable = false)
     var content: String = "",
 
-    @Column(nullable = false)
-    var fromEmail: String = "",
-
     @ElementCollection
     @CollectionTable(name = "mail_receivers", joinColumns = [JoinColumn(name = "mail_id")])
-    var receiver: MutableList<String> = mutableListOf(),
+    val receiver: MutableList<String> = mutableListOf(),
 
     @ElementCollection
     @CollectionTable(name = "mail_cc", joinColumns = [JoinColumn(name = "mail_id")])
-    var carbonCopy: MutableList<String> = mutableListOf(),
+    val carbonCopy: MutableList<String> = mutableListOf(),
 
     @ElementCollection
     @CollectionTable(name = "mail_bcc", joinColumns = [JoinColumn(name = "mail_id")])
-    var blindCarbonCopy: MutableList<String> = mutableListOf(),
+    val blindCarbonCopy: MutableList<String> = mutableListOf(),
 
     @ElementCollection
     @CollectionTable(name = "mail_reply_to", joinColumns = [JoinColumn(name = "mail_id")])
@@ -56,6 +55,7 @@ class Mail(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id", nullable = false)
+    @Column(updatable = false)
     var sender: User,
 
     @OneToMany(
@@ -65,6 +65,3 @@ class Mail(
     )
     var attachments: MutableList<Attachment> = mutableListOf()
 )
-
-enum class MailStatus { DRAFT, SENT, ERROR }
-enum class MailSource { INTERN, EXTERN }
