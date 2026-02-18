@@ -55,7 +55,7 @@ class Mail(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id", nullable = false)
-    @Column(updatable = false)
+
     var sender: User,
 
     @OneToMany(
