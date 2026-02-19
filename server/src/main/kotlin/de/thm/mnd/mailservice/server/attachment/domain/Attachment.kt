@@ -21,7 +21,11 @@ class Attachment(
     @Column(nullable = false)
     var size: Long = 0,
 
+    @Lob
+    @Column(columnDefinition = "BLOB", nullable = false)
+    var content: ByteArray = byteArrayOf(),
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mail_id", nullable = false)
-    var mail: Mail
+    @JoinColumn(name = "mail_id")
+    var mail: Mail? = null
 )
