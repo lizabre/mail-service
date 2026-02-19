@@ -6,6 +6,8 @@ import de.thm.mnd.mailservice.server.user.server.domain.UserAuthResult
 import de.thm.mnd.mailservice.server.utils.JwtService
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import java.util.UUID
+
 @Service
 class UserService(private val userRepository: UserRepository,
                   private val passwordEncoder: PasswordEncoder,
@@ -32,6 +34,16 @@ class UserService(private val userRepository: UserRepository,
         }
         val token = jwtService.generateToken(user);
         return UserAuthResult(user, token);
+    }
+    // Only for testing purposes, not recommended for production
+    override fun deleteUser(userId: UUID): Boolean {
+        val user = userRepository.findById(userId).orElse(null) ?: return false
+        userRepository.delete(user);
+        return true;
+    }
+
+    override fun getAllUsers(): List<User> {
+        return userRepository.findAll().toList();
     }
 
 }
