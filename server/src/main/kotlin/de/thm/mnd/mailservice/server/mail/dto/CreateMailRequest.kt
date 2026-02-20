@@ -6,6 +6,7 @@ data class CreateMailRequest(
     val receiver: List<String>,
     val carbonCopy: List<String> = emptyList(),
     val blindCarbonCopy: List<String> = emptyList(),
-    val replyTo: List<String> = emptyList()
+    val replyTo: List<String> = emptyList(),
+    val send: Boolean = false
 )
 
