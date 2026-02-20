@@ -5,7 +5,7 @@ import de.thm.mnd.mailservice.server.user.dto.UserLoginRequest
 import de.thm.mnd.mailservice.server.user.dto.UserRegisterRequest
 import de.thm.mnd.mailservice.server.user.dto.UserResponse
 import de.thm.mnd.mailservice.server.user.dto.toUserResponse
-import de.thm.mnd.mailservice.server.user.server.UserService
+import de.thm.mnd.mailservice.server.user.service.UserService
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable

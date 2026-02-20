@@ -13,6 +13,7 @@ import de.thm.mnd.mailservice.server.utils.exceptions.IllegalMailStateException
 import de.thm.mnd.mailservice.server.utils.exceptions.MailAccessDeniedException
 import de.thm.mnd.mailservice.server.utils.exceptions.MailNotFoundException
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -25,18 +26,15 @@ class MailService(private val mailRepository: MailRepository, private val userRe
             .orElseThrow { MailAccessDeniedException("User not found") }
 
         val mail = Mail(
-            subject = request.subject,
-            content = request.content,
+            subject = request.subject ?: "",
+            content = request.content ?: "",
             receiver = request.receiver.toMutableList(),
             carbonCopy = request.carbonCopy.toMutableList(),
             blindCarbonCopy = request.blindCarbonCopy.toMutableList(),
             replyTo = request.replyTo.toMutableList(),
-            sender = user
+            sender = user,
+            status = MailStatus.DRAFT
         )
-
-        if (request.send) {
-            sendMailInternal(mail)
-        }
 
         return mailRepository.save(mail).toResponseFor(userId)
     }
@@ -44,7 +42,18 @@ class MailService(private val mailRepository: MailRepository, private val userRe
     override fun sendMailDraft(userId: UUID, mailId: UUID): MailResponse {
         val mail = getOwnedMail(userId, mailId)
 
-        sendMailInternal(mail)
+        if (mail.status != MailStatus.DRAFT) {
+            throw IllegalMailStateException("Mail already sent")
+        }
+
+        val errors = mailValidator.validateBeforeSend(mail)
+        if (errors.isNotEmpty()) {
+            throw IllegalMailStateException(errors.joinToString(", "))
+        }
+
+        mail.status = MailStatus.SENT
+        mail.sentAt = LocalDateTime.now()
+        mail.updatedAt = LocalDateTime.now()
 
         return mailRepository.save(mail).toResponseFor(userId)
     }
@@ -81,9 +90,8 @@ class MailService(private val mailRepository: MailRepository, private val userRe
         mailRepository.delete(mail)
     }
 
-    override fun getMailById(userId: UUID, mailId: UUID): MailResponse {
-        return getOwnedMail(userId, mailId).toResponseFor(userId)
-    }
+    override fun getMailById(userId: UUID, mailId: UUID): MailResponse =
+        getOwnedMail(userId, mailId).toResponseFor(userId)
 
     override fun getSentMails(userId: UUID): List<MailResponse> =
         mailRepository
@@ -122,20 +130,5 @@ class MailService(private val mailRepository: MailRepository, private val userRe
         }
 
         return mail
-    }
-
-    private fun sendMailInternal(mail: Mail) {
-        if (mail.status != MailStatus.DRAFT) {
-            throw IllegalMailStateException("Mail already sent")
-        }
-
-        val errors = mailValidator.validateBeforeSend(mail)
-        if (errors.isNotEmpty()) {
-            throw IllegalMailStateException(errors.joinToString(", "))
-        }
-
-        mail.status = MailStatus.SENT
-        mail.sentAt = LocalDateTime.now()
-        mail.updatedAt = LocalDateTime.now()
     }
 }

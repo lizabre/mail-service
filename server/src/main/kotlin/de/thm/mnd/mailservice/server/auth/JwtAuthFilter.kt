@@ -1,5 +1,6 @@
-package de.thm.mnd.mailservice.server.utils
+package de.thm.mnd.mailservice.server.auth
 
+import de.thm.mnd.mailservice.server.auth.JwtService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse

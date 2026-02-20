@@ -1,4 +1,4 @@
-package de.thm.mnd.mailservice.server.utils
+package de.thm.mnd.mailservice.server.auth
 
 import de.thm.mnd.mailservice.server.user.domain.User
 import io.jsonwebtoken.Jwts

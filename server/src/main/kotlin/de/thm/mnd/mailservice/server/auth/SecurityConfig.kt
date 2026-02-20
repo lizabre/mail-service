@@ -1,4 +1,4 @@
-package de.thm.mnd.mailservice.server.utils
+package de.thm.mnd.mailservice.server.auth
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

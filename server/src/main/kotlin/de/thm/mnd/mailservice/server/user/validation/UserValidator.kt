@@ -1,4 +1,4 @@
-package de.thm.mnd.mailservice.server.utils
+package de.thm.mnd.mailservice.server.user.validation
 
 import org.springframework.stereotype.Component
 
