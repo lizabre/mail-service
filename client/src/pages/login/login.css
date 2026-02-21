@@ -1,0 +1,14 @@
+h1{
+  font-size: 96px;
+}
+.center-div{
+  display: flex;
+  flex-direction: column;
+  justify-self: center;
+  align-self: center;
+}
+.low-form{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
