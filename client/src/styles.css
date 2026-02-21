@@ -1,1 +1,11 @@
 /* You can add global styles to this file, and also import other style files */
+@font-face {
+  font-family:'Judson';
+  src: url('./assets/fonts/Judson-Regular.ttf') format("truetype");
+  font-weight: normal;
+}
+
+body{
+  background-color: #EADDFF;
+  font-family: 'Judson', serif;
+}

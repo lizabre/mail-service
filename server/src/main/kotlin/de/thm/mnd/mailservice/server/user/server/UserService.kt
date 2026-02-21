@@ -5,6 +5,7 @@ import de.thm.mnd.mailservice.server.user.repository.UserRepository
 import de.thm.mnd.mailservice.server.user.server.domain.UserAuthResult
 import de.thm.mnd.mailservice.server.utils.JwtService
 import de.thm.mnd.mailservice.server.utils.UserValidator
+import de.thm.mnd.mailservice.server.utils.exceptions.EmailAlreadyExistsException
 import de.thm.mnd.mailservice.server.utils.exceptions.InvalidLoginCredentials
 import de.thm.mnd.mailservice.server.utils.exceptions.InvalidValidationException
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -27,7 +28,9 @@ class UserService(private val userRepository: UserRepository,
         if (errors.isNotEmpty()) {
             throw InvalidValidationException(errors)
         }
-
+        if(userRepository.existsByEmail(email)) {
+            throw EmailAlreadyExistsException("Email $email already exists");
+        }
         val user = User(first_name = firstName, last_name=lastName, email = email, password = passwordEncoder.encode((rawPassword)) as String);
         userRepository.save(user);
         val token = jwtService.generateToken(user);

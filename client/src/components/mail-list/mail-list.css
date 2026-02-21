@@ -1,0 +1,13 @@
+.mail-list-container{
+  padding: 30px;
+}
+
+.main-header{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+mat-paginator{
+  margin-top: 20px;
+}

@@ -1,0 +1,15 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 15px;
+}
+.back-icon{
+  align-self: flex-start;
+  margin: 30px 0 5px 0;
+}
+
+
+.no-display{
+  display: none;
+}
