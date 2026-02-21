@@ -5,6 +5,7 @@ import de.thm.mnd.mailservice.server.mail.dto.MailResponse
 import de.thm.mnd.mailservice.server.mail.dto.UpdateMailRequest
 import de.thm.mnd.mailservice.server.mail.service.MailServiceInterface
 import de.thm.mnd.mailservice.server.shared.MailFolder
+import org.springframework.http.HttpStatus
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 import java.util.UUID
@@ -14,6 +15,7 @@ import java.util.UUID
 class MailController(private val mailService: MailServiceInterface) {
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     fun createMail(authentication: Authentication, @RequestBody request: CreateMailRequest): MailResponse {
         val userId = UUID.fromString(authentication.name)
         return mailService.create(userId, request)
@@ -49,6 +51,7 @@ class MailController(private val mailService: MailServiceInterface) {
     }
 
     @DeleteMapping("/{mailId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteMail(authentication: Authentication, @PathVariable mailId: UUID) {
         val userId = UUID.fromString(authentication.name)
         mailService.deleteMail(userId, mailId)

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 class UserController(private val userService: UserService) {
     @PostMapping("/register")
     fun registerUser(@RequestBody request: UserRegisterRequest): UserResponse {

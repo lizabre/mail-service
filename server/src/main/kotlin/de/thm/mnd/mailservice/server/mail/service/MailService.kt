@@ -19,7 +19,7 @@ import java.util.UUID
 
 @Service
 class MailService(private val mailRepository: MailRepository, private val userRepository: UserRepository, private val mailValidator: MailValidator) : MailServiceInterface {
-
+    @Transactional
     override fun create(userId: UUID, request: CreateMailRequest): MailResponse {
 
         val user = userRepository.findById(userId)
@@ -39,6 +39,7 @@ class MailService(private val mailRepository: MailRepository, private val userRe
         return mailRepository.save(mail).toResponseFor(userId)
     }
 
+    @Transactional
     override fun sendMailDraft(userId: UUID, mailId: UUID): MailResponse {
         val mail = getOwnedMail(userId, mailId)
 
@@ -58,6 +59,7 @@ class MailService(private val mailRepository: MailRepository, private val userRe
         return mailRepository.save(mail).toResponseFor(userId)
     }
 
+    @Transactional
     override fun updateMail(userId: UUID, mailId: UUID, request: UpdateMailRequest): MailResponse {
         val mail = getOwnedMail(userId, mailId)
 
@@ -84,7 +86,7 @@ class MailService(private val mailRepository: MailRepository, private val userRe
 
         return mailRepository.save(mail).toResponseFor(userId)
     }
-
+    @Transactional
     override fun deleteMail(userId: UUID, mailId: UUID) {
         val mail = getOwnedMail(userId, mailId)
         mailRepository.delete(mail)
