@@ -1,0 +1,21 @@
+<h3>{{ label }}</h3>
+<mat-form-field appearance="fill" style="width: 100%">
+  <mat-label>{{ label }}</mat-label>
+  <input
+    matInput
+    [type]="inputType"
+    [placeholder]="placeholder"
+    [formControl]="control"
+  />
+  <button
+    *ngIf="isPassword"
+    matIconSuffix
+    mat-icon-button
+    type="button"
+    (click)="togglePasswordVisibility()"
+  >
+    <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+  </button>
+
+  <mat-error *ngIf="control.invalid">{{ getErrorMessage() }}</mat-error>
+</mat-form-field>

@@ -1,0 +1,42 @@
+<div class="center-div">
+  <h1>Sign up!</h1>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <app-input-field
+      label="Fisrt Name"
+      placeholder="Enter your first name"
+      [control]="firstNameControl"
+    />
+    <app-input-field
+      label="Last Name"
+      placeholder="Enter your lastname"
+      [control]="lastNameControl"
+    />
+
+    <app-input-field
+      label="Email"
+      type="email"
+      placeholder="Enter your email"
+      [control]="emailControl"
+    />
+
+    <app-input-field
+      label="Password"
+      type="password"
+      placeholder="Enter your password"
+      [control]="passwordControl"
+    />
+    <app-input-field
+      label="Confirm Password"
+      type="password"
+      placeholder="Confirm your password"
+      [control]="confirmPasswordControl"
+    />
+    <mat-error *ngIf="form.hasError('passwordMismatch') && form.get('confirmPassword')?.touched">
+      Passwords do not match
+    </mat-error>
+    <div class="low-form">
+      <a matButton href="/login">I already have an account</a>
+      <button matButton="filled" type="submit">Submit</button>
+    </div>
+  </form>
+</div>

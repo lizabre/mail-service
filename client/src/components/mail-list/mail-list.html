@@ -1,0 +1,22 @@
+<div class="mail-list-container">
+  <div class="main-header">
+    <h2>welcome, {{ user?.firstName }} {{ user?.lastName }}!</h2>
+    <a matButton="filled" href="/new-mail">Write an email</a>
+  </div>
+  <mat-nav-list>
+    <app-mail-list-item
+      *ngFor="let mail of pagedMails"
+      [id]="mail.id"
+      [subject]="mail.subject"
+      [sender]="mail.sender"
+      [content]="mail.content"
+      [isExternal]="mail.isExternal"
+    ></app-mail-list-item>
+  </mat-nav-list>
+  <mat-paginator [length]="mails.length"
+                 [pageSize]="pageSize"
+                 [pageSizeOptions]="[5, 10, 20]"
+                 (page)="onPageChange($event)"
+                 aria-label="Select page">
+  </mat-paginator>
+</div>

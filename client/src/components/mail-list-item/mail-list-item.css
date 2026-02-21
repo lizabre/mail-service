@@ -1,0 +1,6 @@
+.received{
+  background-color: rgba(123, 97, 225, 50%);
+}
+.mdc-list-item--with-leading-icon.mdc-list-item--with-two-lines .mdc-list-item__primary-text{
+  margin-top: -5px;
+}

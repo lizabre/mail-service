@@ -1,0 +1,24 @@
+<h3>{{ label }}</h3>
+<mat-form-field appearance="fill" style="width: 100%">
+  <mat-label>{{ label }}</mat-label>
+  <mat-chip-grid #chipGrid aria-label="Enter keywords" [formControl]="control">
+    @for (chip of chipList(); track chip) {
+      <mat-chip-row (removed)="removeKeyword(chip)">
+        {{chip}}
+        <button matChipRemove [attr.aria-label]="'remove ' + chip">
+          <mat-icon>cancel</mat-icon>
+        </button>
+      </mat-chip-row>
+    }
+  </mat-chip-grid>
+  <input
+    matInput
+    type="text"
+    [placeholder]="placeholder"
+    [formControl]="control"
+    [matChipInputFor]="chipGrid"
+    (matChipInputTokenEnd)="add($event)"
+  />
+
+  <mat-error *ngIf="control.invalid">{{ getErrorMessage() }}</mat-error>
+</mat-form-field>
