@@ -1,6 +1,6 @@
 package de.thm.mnd.mailservice.server.user.dto
 
-import de.thm.mnd.mailservice.server.user.server.domain.UserAuthResult
+import de.thm.mnd.mailservice.server.user.service.domain.UserAuthResult
 
 data class UserResponse(
     val id: java.util.UUID,
