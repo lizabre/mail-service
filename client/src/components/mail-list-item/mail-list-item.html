@@ -1,9 +1,8 @@
-<a
-  mat-list-item [class.received]="isExternal"  href="/mail">
+<a mat-list-item [class.received]="isExternal" (click)="navigateToMail()">
   <mat-icon matListItemIcon>folder</mat-icon>
   <span matListItemTitle>{{ subject }} by {{ sender }}</span>
   <span matListItemLine>{{ content }}</span>
-  <button matListItemMeta matIconButton>
+  <button matListItemMeta matIconButton (click)="onDelete($event)">
     <mat-icon>delete</mat-icon>
   </button>
 </a>
