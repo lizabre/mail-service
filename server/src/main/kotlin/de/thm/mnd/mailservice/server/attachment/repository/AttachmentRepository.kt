@@ -9,6 +9,4 @@ import java.util.UUID
 
 @Repository
 interface AttachmentRepository : CrudRepository<Attachment, UUID> {
-    fun findAllByMail(mail: Mail): List<Attachment>
-    fun deleteAllByMail(mail: Mail)
 }
