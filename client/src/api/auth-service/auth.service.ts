@@ -6,7 +6,7 @@ import {HttpClient} from '@angular/common/http';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly API_URL = 'http://localhost:8080/users';
+  private readonly API_URL = 'http://localhost:8080/api/v1.0/users';
   private readonly TOKEN_KEY = 'access_token';
 
   private accessToken: string | null = null;
