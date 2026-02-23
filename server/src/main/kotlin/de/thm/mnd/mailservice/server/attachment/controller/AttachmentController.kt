@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile
 import java.util.UUID
 
 @RestController
-@RequestMapping("/api/mails/{mailId}/attachments")
+@RequestMapping("/api/v1.0/mails/{mailId}/attachments")
 class AttachmentController(private val attachmentService: AttachmentServiceInterface) {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
