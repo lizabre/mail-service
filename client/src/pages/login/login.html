@@ -1,0 +1,24 @@
+<div class="center-div">
+  <h1>Log in!</h1>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+    <app-input-field
+      label="Email"
+      type="email"
+      placeholder="Enter your email"
+      [control]="emailControl"
+    />
+
+    <app-input-field
+      label="Password"
+      type="password"
+      placeholder="Enter your password"
+      [control]="passwordControl"
+    />
+    <div class="low-form">
+      <a matButton href="/register">I don't have an account</a>
+      <button matButton="filled" type="submit">Submit</button>
+    </div>
+  </form>
+</div>
+

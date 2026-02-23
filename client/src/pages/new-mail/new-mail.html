@@ -1,0 +1,55 @@
+<button matIconButton class="back-icon" routerLink="../">
+  <mat-icon>keyboard_backspace</mat-icon>
+</button>
+<form class="new-mail-container" [formGroup]="form" (ngSubmit)="onSubmit()">
+  <h2>New Mail</h2>
+  <div>
+  <app-chip-field label="To" placeholder="Enter recipient's email" [control]="toControl"></app-chip-field>
+    <button matButton [matMenuTriggerFor]="menu"><mat-icon>add</mat-icon> Add CC/BCC/Reply to</button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item (click)="showCc=true">
+        <span>Carbon Copy (CC)</span>
+      </button>
+      <button mat-menu-item (click)="showBcc=true">
+        <span>Blind Carbon Copy (BCC)</span>
+      </button>
+      <button mat-menu-item (click)="showReplyTo=true">
+        <span>Reply to</span>
+      </button>
+    </mat-menu>
+  </div>
+  <app-chip-field *ngIf="showCc" label="Carbon Copy (CC)" placeholder="Enter emails" [control]="ccControl"></app-chip-field>
+  <app-chip-field *ngIf="showBcc" label="Blind Carbon Copy (CC)" placeholder="Enter emails" [control]="bccControl"></app-chip-field>
+  <app-chip-field *ngIf="showReplyTo" label="Reply to" placeholder="Enter emails" [control]="replyToControl"></app-chip-field>
+  <app-input-field label="Subject" placeholder="Enter subject" [control]="subjectControl"></app-input-field>
+  <mat-form-field appearance="fill" style="width: 100%">
+    <mat-label>Message</mat-label>
+    <textarea matInput placeholder="Write your message here..." [formControl]="bodyControl"></textarea>
+    <mat-error *ngIf="bodyControl.invalid">Please enter the message</mat-error>
+  </mat-form-field>
+
+  <input
+    id="fileInput"
+    type="file"
+    multiple
+    style="display: none"
+    (change)="onFileSelected($event)"
+  />
+
+  <div style="margin: 16px 0;">
+    <button
+      mat-raised-button
+      color="accent"
+      type="button"
+      (click)="triggerFileInput()"
+    >
+      <mat-icon>attach_file</mat-icon>
+      Add Attachments
+    </button>
+    <span *ngIf="selectedFileName" style="margin-left: 16px; color: #666;">
+      {{ selectedFileName }}
+    </span>
+  </div>
+
+  <button mat-raised-button color="primary" type="submit">Send</button>
+</form>
