@@ -26,6 +26,6 @@ class Attachment(
     var content: ByteArray = byteArrayOf(),
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mail_id")
-    var mail: Mail? = null
+    @JoinColumn(name = "mail_id", nullable = false)
+    var mail: Mail
 )

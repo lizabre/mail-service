@@ -1,7 +1,7 @@
-package de.thm.mnd.mailservice.server.user.server
+package de.thm.mnd.mailservice.server.user.service
 
 import de.thm.mnd.mailservice.server.user.domain.User
-import de.thm.mnd.mailservice.server.user.server.domain.UserAuthResult
+import de.thm.mnd.mailservice.server.user.service.domain.UserAuthResult
 import java.util.UUID
 
 interface UserServiceInterface {

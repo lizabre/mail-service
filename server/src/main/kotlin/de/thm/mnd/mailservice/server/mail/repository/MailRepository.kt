@@ -9,7 +9,8 @@ import java.util.UUID
 
 @Repository
 interface MailRepository : CrudRepository<Mail, UUID> {
-    fun findAllBySender(sender: User): List<Mail>
-    fun findByIdAndSender(id: UUID, sender: User): List<Mail>
     fun findBySenderIdAndStatus(senderId: UUID, status: MailStatus): List<Mail>
+    fun findByStatusAndReceiverContains(status: MailStatus, email: String): List<Mail>
+    fun findByStatusAndCarbonCopyContains(status: MailStatus, email: String): List<Mail>
+    fun findByStatusAndBlindCarbonCopyContains(status: MailStatus, email: String): List<Mail>
 }

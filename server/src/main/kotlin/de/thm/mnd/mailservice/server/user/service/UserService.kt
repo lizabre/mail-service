@@ -1,10 +1,10 @@
-package de.thm.mnd.mailservice.server.user.server
+package de.thm.mnd.mailservice.server.user.service
 
 import de.thm.mnd.mailservice.server.user.domain.User
 import de.thm.mnd.mailservice.server.user.repository.UserRepository
-import de.thm.mnd.mailservice.server.user.server.domain.UserAuthResult
-import de.thm.mnd.mailservice.server.utils.JwtService
-import de.thm.mnd.mailservice.server.utils.UserValidator
+import de.thm.mnd.mailservice.server.user.service.domain.UserAuthResult
+import de.thm.mnd.mailservice.server.auth.JwtService
+import de.thm.mnd.mailservice.server.user.validation.UserValidator
 import de.thm.mnd.mailservice.server.utils.exceptions.InvalidLoginCredentials
 import de.thm.mnd.mailservice.server.utils.exceptions.InvalidValidationException
 import org.springframework.security.crypto.password.PasswordEncoder

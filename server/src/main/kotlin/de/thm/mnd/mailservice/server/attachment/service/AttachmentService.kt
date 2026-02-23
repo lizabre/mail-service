@@ -3,82 +3,113 @@ package de.thm.mnd.mailservice.server.attachment.service
 import de.thm.mnd.mailservice.server.attachment.domain.Attachment
 import de.thm.mnd.mailservice.server.attachment.dto.AttachmentResponse
 import de.thm.mnd.mailservice.server.attachment.repository.AttachmentRepository
+import de.thm.mnd.mailservice.server.attachment.validation.AttachmentValidator
+import de.thm.mnd.mailservice.server.mail.domain.Mail
+import de.thm.mnd.mailservice.server.mail.repository.MailRepository
+import de.thm.mnd.mailservice.server.shared.MailStatus
+import de.thm.mnd.mailservice.server.user.repository.UserRepository
+import de.thm.mnd.mailservice.server.utils.exceptions.IllegalMailStateException
+import de.thm.mnd.mailservice.server.utils.exceptions.MailAccessDeniedException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import java.util.UUID
 
 @Service
-class AttachmentService(private val attachmentRepository: AttachmentRepository) {
+class AttachmentService(
+    private val attachmentRepository: AttachmentRepository,
+    private val mailRepository: MailRepository,
+    private val userRepository: UserRepository,
+    private val attachmentValidator: AttachmentValidator
+): AttachmentServiceInterface {
+    override fun getAttachmentMetadata(userId: UUID, mailId: UUID, attachmentId: UUID): AttachmentResponse {
 
-    fun getAttachmentMetadata(id: UUID): AttachmentResponse {
-        val attachment = findAttachmentOrThrow(id)
+        val user = userRepository.findById(userId)
+            .orElseThrow { MailAccessDeniedException("User not found") }
+
+        val mail = mailRepository.findById(mailId)
+            .orElseThrow { IllegalArgumentException("Mail not found") }
+
+        validateMailAccess(userId, user.email, mail)
+
+        val attachment = mail.attachments
+            .firstOrNull { it.id == attachmentId }
+            ?: throw IllegalArgumentException("Attachment not found in this mail")
 
         return AttachmentResponse(
-            id = attachment.id ?: throw IllegalStateException("Attachment ID must not be null"),
+            id = attachment.id!!,
             fileName = attachment.fileName,
             mimeType = attachment.mimeType,
             size = attachment.size
         )
     }
 
-    fun getAllAttachments(): List<AttachmentResponse> {
-        return attachmentRepository.findAll()
-            .map { attachment ->
-                AttachmentResponse(
-                    id = attachment.id
-                        ?: throw IllegalStateException("Attachment ID must not be null"),
-                    fileName = attachment.fileName,
-                    mimeType = attachment.mimeType,
-                    size = attachment.size
-                )
-            }
-    }
+    override fun uploadToMail(userId: UUID, mailId: UUID, file: MultipartFile): AttachmentResponse {
+        val mail = mailRepository.findById(mailId)
+            .orElseThrow { IllegalArgumentException("Mail not found") }
 
-    @Transactional
-    fun deleteAttachment(id: UUID) {
-        val attachment = findAttachmentOrThrow(id)
-        attachmentRepository.delete(attachment)
-    }
+        if (mail.sender.id != userId) {
+            throw MailAccessDeniedException("Not allowed to add attachment")
+        }
 
-    @Transactional
-    fun processUpload(file: MultipartFile): AttachmentResponse {
+        if (mail.status != MailStatus.DRAFT) {
+            throw IllegalMailStateException("Cannot modify attachments of sent mail")
+        }
 
-        validateFile(file)
+        val errors = attachmentValidator.validate(file)
+        if (errors.isNotEmpty()) {
+            throw IllegalMailStateException(errors.joinToString(", "))
+        }
 
         val attachment = Attachment(
-            fileName = file.originalFilename?.takeIf { it.isNotBlank() } ?: "unnamed_file",
+            fileName = file.originalFilename ?: "unnamed_file",
             mimeType = file.contentType ?: "application/octet-stream",
             size = file.size,
-            content = file.bytes
+            content = file.bytes,
+            mail = mail
         )
+
+        mail.attachments.add(attachment)
 
         val saved = attachmentRepository.save(attachment)
 
         return AttachmentResponse(
-            id = saved.id ?: throw IllegalStateException("Saved attachment has no ID"),
+            id = saved.id!!,
             fileName = saved.fileName,
             mimeType = saved.mimeType,
             size = saved.size
         )
     }
 
-    private fun validateFile(file: MultipartFile) {
-        if (file.isEmpty) {
-            throw IllegalArgumentException("Cannot upload an empty file")
+    override fun deleteAttachment(userId: UUID, mailId: UUID, attachmentId: UUID) {
+        val mail = mailRepository.findById(mailId)
+            .orElseThrow { IllegalArgumentException("Mail not found") }
+
+        if (mail.sender.id != userId) {
+            throw MailAccessDeniedException("Not allowed to delete attachment")
         }
 
-        if (file.size <= 0) {
-            throw IllegalArgumentException("File size must be greater than 0")
+        if (mail.status != MailStatus.DRAFT) {
+            throw IllegalMailStateException("Cannot delete attachment from sent mail")
         }
 
-        if (file.size > 10_000_000) {
-            throw IllegalArgumentException("File exceeds maximum allowed size (10MB)")
-        }
+        val attachment = mail.attachments
+            .firstOrNull { it.id == attachmentId }
+            ?: throw IllegalArgumentException("Attachment not found in this mail")
+
+        attachmentRepository.delete(attachment)
     }
 
-    private fun findAttachmentOrThrow(id: UUID): Attachment {
-        return attachmentRepository.findById(id)
-            .orElseThrow { NoSuchElementException("Attachment with id $id not found") }
+    private fun validateMailAccess(userId: UUID, userEmail: String, mail: Mail) {
+
+        val isSender = mail.sender.id == userId
+        val isReceiver =
+            mail.receiver.contains(userEmail) ||
+                    mail.carbonCopy.contains(userEmail) ||
+                    mail.blindCarbonCopy.contains(userEmail)
+
+        if (!isSender && !isReceiver) {
+            throw MailAccessDeniedException("Not allowed to access this mail")
+        }
     }
 }

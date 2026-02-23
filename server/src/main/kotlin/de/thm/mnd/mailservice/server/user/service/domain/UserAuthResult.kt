@@ -1,4 +1,4 @@
-package de.thm.mnd.mailservice.server.user.server.domain
+package de.thm.mnd.mailservice.server.user.service.domain
 
 import de.thm.mnd.mailservice.server.user.domain.User
 
