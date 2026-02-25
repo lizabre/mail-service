@@ -1,5 +1,5 @@
 <div class="attachment-box">
-<span>file.ext</span>
-  <span>size</span>
-  <button matButton>Download</button>
+  <span>{{ fileName }}</span>
+  <span>{{ formattedSize }}</span>
+  <button matButton color="warn" (click)="onDelete()">Delete</button>
 </div>

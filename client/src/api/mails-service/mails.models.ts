@@ -1,19 +1,21 @@
+import {AttachmentResponse} from '../attachment-service/attachment.models';
+
 export type MailFolder = 'INBOX' | 'SENT' | 'DRAFTS';
 
 export type MailStatus = 'DRAFT' | 'SENT' | 'ERROR';
 
-export interface AttachmentResponse {
+export interface UserSummaryResponse {
   id: string;
-  fileName: string;
-  mimeType: string;
-  size: number;
+  firstName: string;
+  lastName: string;
+  email: string;
 }
 
 export interface MailResponse {
   id: string;
   subject: string;
   content: string;
-  from: string;
+  sender: UserSummaryResponse;
   receiver: string[];
   carbonCopy: string[];
   blindCarbonCopy: string[];

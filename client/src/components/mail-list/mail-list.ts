@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
 import {MatNavList} from '@angular/material/list';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {User} from '../../api/auth-service/auth.models';
@@ -33,7 +33,8 @@ export class MailList implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private mailService: MailService
+    private mailService: MailService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -48,9 +49,9 @@ export class MailList implements OnInit {
     this.mailService.getMails(this.folder).subscribe({
 
       next: (data) => {
-        console.log(data)
         this.mails = data;
         this.updatePagedMails();
+        this.cdr.detectChanges();
       },
       error: (err) => console.error('Failed to load mails', err)
     });
@@ -61,6 +62,7 @@ export class MailList implements OnInit {
       next: () => {
         this.mails = this.mails.filter(m => m.id !== mailId);
         this.updatePagedMails();
+        this.cdr.detectChanges();
       },
       error: (err) => console.error('Failed to delete mail', err)
     });

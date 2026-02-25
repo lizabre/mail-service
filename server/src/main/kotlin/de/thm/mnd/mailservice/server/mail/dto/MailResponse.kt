@@ -42,7 +42,7 @@ fun Mail.toResponseFor(userId: UUID): MailResponse {
         blindCarbonCopy = if (isSender) this.blindCarbonCopy else emptyList(),
         replyTo = this.replyTo,
         status = this.status,
-        source = this.source,
+        source =  if (isSender) MailSource.INTERN else MailSource.EXTERN,
         createdAt = this.createdAt,
         updatedAt = this.updatedAt,
         sentAt = this.sentAt,

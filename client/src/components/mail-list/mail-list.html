@@ -8,7 +8,7 @@
       *ngFor="let mail of pagedMails"
       [id]="mail.id"
       [subject]="mail.subject"
-      [sender]="mail.from"
+      [sender]="mail.sender.email"
       [content]="mail.content"
       [isExternal]="mail.source === 'EXTERN'"
       (deleteClicked)="onDelete($event)">

@@ -92,8 +92,24 @@ class MailService(private val mailRepository: MailRepository, private val userRe
         mailRepository.delete(mail)
     }
 
-    override fun getMailById(userId: UUID, mailId: UUID): MailResponse =
-        getOwnedMail(userId, mailId).toResponseFor(userId)
+    override fun getMailById(userId: UUID, mailId: UUID): MailResponse {
+        val user = userRepository.findById(userId)
+            .orElseThrow { MailAccessDeniedException("User not found") }
+
+        val mail = mailRepository.findById(mailId)
+            .orElseThrow { MailNotFoundException("Mail not found") }
+
+        val isSender = mail.sender.id == userId
+        val isReceiver = mail.receiver.contains(user.email) ||
+                mail.carbonCopy.contains(user.email) ||
+                mail.blindCarbonCopy.contains(user.email)
+
+        if (!isSender && !isReceiver) {
+            throw MailAccessDeniedException("Not allowed")
+        }
+
+        return mail.toResponseFor(userId)
+    }
 
     override fun getSentMails(userId: UUID): List<MailResponse> =
         mailRepository

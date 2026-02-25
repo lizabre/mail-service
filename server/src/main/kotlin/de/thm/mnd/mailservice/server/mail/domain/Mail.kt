@@ -4,7 +4,6 @@ package de.thm.mnd.mailservice.server.mail.domain
 import de.thm.mnd.mailservice.server.user.domain.User
 import de.thm.mnd.mailservice.server.attachment.domain.Attachment
 import de.thm.mnd.mailservice.server.shared.MailStatus
-import de.thm.mnd.mailservice.server.shared.MailSource
 import jakarta.persistence.*
 import java.time.LocalDateTime
 import java.util.UUID
@@ -41,10 +40,6 @@ class Mail(
 
     @Enumerated(EnumType.STRING)
     var status: MailStatus = MailStatus.DRAFT,
-
-    @Enumerated(EnumType.STRING)
-    @Column(updatable = false)
-    val source: MailSource = MailSource.INTERN,
 
     @Column(updatable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
