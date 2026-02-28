@@ -7,6 +7,8 @@ import {MailService} from '../../api/mails-service/mails.service';
 import {AttachmentService} from '../../api/attachment-service/attachment.service';
 import {MailResponse} from '../../api/mails-service/mails.models';
 import {NgForOf, NgIf} from '@angular/common';
+import {Dialog} from '../../components/dialog/dialog';
+import {MatDialog} from '@angular/material/dialog';
 
 @Component({
   selector: 'app-mail',
@@ -30,7 +32,8 @@ export class Mail implements OnInit {
     private router: Router,
     private mailService: MailService,
     private attachmentService: AttachmentService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -47,12 +50,28 @@ export class Mail implements OnInit {
       }
     });
   }
+  private showError(title: string, message: string): void {
+    this.dialog.open(Dialog, {
+      data: {title, message}
+    });
+  }
+
+  private getErrorMessage(err: unknown): string {
+    if (err && typeof err === 'object' && 'error' in err) {
+      const error = (err as {error: {message?: string, errors?: string}}).error;
+      if (error.message) return error.message;
+      if (error.errors) return error.errors;
+    }
+    return 'An unexpected error occurred. Please try again.';
+  }
 
   onDelete(): void {
     if (!this.mail) return;
     this.mailService.deleteMail(this.mail.id).subscribe({
       next: () => this.router.navigate(['/']),
-      error: (err: unknown) => console.error('Failed to delete mail', err)
+      error: (err) => {
+        this.showError('Failed to delete an email', `${this.getErrorMessage(err)}`);
+      }
     });
   }
 
@@ -63,7 +82,9 @@ export class Mail implements OnInit {
         this.mail!.attachments = this.mail!.attachments.filter(a => a.id !== attachmentId);
         this.cdr.detectChanges();
       },
-      error: (err: unknown) => console.error('Failed to delete attachment', err)
+      error: (err) => {
+        this.showError('Failed to delete attachment', `${this.getErrorMessage(err)}`);
+      }
     });
   }
 }

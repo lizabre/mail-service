@@ -8,6 +8,8 @@ import {MailListItem} from '../mail-list-item/mail-list-item';
 import {NgForOf} from '@angular/common';
 import {MailService} from '../../api/mails-service/mails.service';
 import {MailResponse} from '../../api/mails-service/mails.models';
+import {Dialog} from '../dialog/dialog';
+import {MatDialog} from '@angular/material/dialog';
 
 @Component({
   selector: 'app-mail-list',
@@ -34,8 +36,24 @@ export class MailList implements OnInit {
   constructor(
     private authService: AuthService,
     private mailService: MailService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private dialog: MatDialog
   ) {}
+
+  private showError(title: string, message: string): void {
+    this.dialog.open(Dialog, {
+      data: {title, message}
+    });
+  }
+
+  private getErrorMessage(err: unknown): string {
+    if (err && typeof err === 'object' && 'error' in err) {
+      const error = (err as {error: {message?: string, errors?: string}}).error;
+      if (error.message) return error.message;
+      if (error.errors) return error.errors;
+    }
+    return 'An unexpected error occurred. Please try again.';
+  }
 
   ngOnInit(): void {
     this.authService.currentUser$.subscribe(user => {
@@ -53,7 +71,9 @@ export class MailList implements OnInit {
         this.updatePagedMails();
         this.cdr.detectChanges();
       },
-      error: (err) => console.error('Failed to load mails', err)
+      error: (err) => {
+        this.showError('Failed to load mails', `${this.getErrorMessage(err)}`);
+      }
     });
   }
 
@@ -64,7 +84,9 @@ export class MailList implements OnInit {
         this.updatePagedMails();
         this.cdr.detectChanges();
       },
-      error: (err) => console.error('Failed to delete mail', err)
+      error: (err) => {
+        this.showError('Failed to delete mail', `${this.getErrorMessage(err)}`);
+      }
     });
   }
 

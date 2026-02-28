@@ -64,7 +64,7 @@ class MailService(private val mailRepository: MailRepository, private val userRe
         val mail = getOwnedMail(userId, mailId)
 
         if (mail.status != MailStatus.DRAFT) {
-            throw IllegalMailStateException("Only drafts can be edited")
+            throw IllegalMailStateException("Only draft mails can be edited. This mail has already been sent")
         }
 
         mail.subject = request.subject
@@ -105,7 +105,7 @@ class MailService(private val mailRepository: MailRepository, private val userRe
                 mail.blindCarbonCopy.contains(user.email)
 
         if (!isSender && !isReceiver) {
-            throw MailAccessDeniedException("Not allowed")
+            throw MailAccessDeniedException("You do not have an access to that email")
         }
 
         return mail.toResponseFor(userId)
@@ -144,7 +144,7 @@ class MailService(private val mailRepository: MailRepository, private val userRe
             .orElseThrow { MailNotFoundException("Mail not found") }
 
         if (mail.sender.id != userId) {
-            throw MailAccessDeniedException("Not allowed")
+            throw MailAccessDeniedException("You do not have an access to that email")
         }
 
         return mail

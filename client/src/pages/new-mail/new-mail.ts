@@ -11,6 +11,8 @@ import {ChipField} from '../../components/chip-field/chip-field';
 import {emailArrayValidator} from '../../utils/emailValidator';
 import {MailService} from '../../api/mails-service/mails.service';
 import {AttachmentService} from '../../api/attachment-service/attachment.service';
+import {MatDialog} from '@angular/material/dialog';
+import {Dialog} from '../../components/dialog/dialog';
 
 @Component({
   selector: 'app-new-mail',
@@ -48,7 +50,8 @@ export class NewMail {
     private fb: FormBuilder,
     private mailService: MailService,
     private attachmentService: AttachmentService,
-    private router: Router
+    private router: Router,
+    private dialog: MatDialog
   ) {
     this.form = this.fb.group({
       to: [[], [Validators.required, emailArrayValidator()]],
@@ -60,6 +63,7 @@ export class NewMail {
       attachments: []
     });
   }
+
   get toControl() { return this.form.get('to') as FormControl; }
   get ccControl() { return this.form.get('cc') as FormControl; }
   get bccControl() { return this.form.get('bcc') as FormControl; }
@@ -67,6 +71,21 @@ export class NewMail {
   get subjectControl() { return this.form.get('subject') as FormControl; }
   get bodyControl() { return this.form.get('body') as FormControl; }
   get attachmentsControl() { return this.form.get('attachments') as FormControl; }
+
+  private showError(title: string, message: string): void {
+    this.dialog.open(Dialog, {
+      data: {title, message}
+    });
+  }
+
+  private getErrorMessage(err: unknown): string {
+    if (err && typeof err === 'object' && 'error' in err) {
+      const error = (err as {error: {message?: string, errors?: string}}).error;
+      if (error.message) return error.message;
+      if (error.errors) return error.errors;
+    }
+    return 'An unexpected error occurred. Please try again.';
+  }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -112,29 +131,29 @@ export class NewMail {
           this.sendDraft(draft.id);
         }
       },
-      error: (err) => {
-        console.error('Failed to create draft', err);
+      error: (err: unknown) => {
         this.isSending = false;
+        this.showError('Failed to create mail', this.getErrorMessage(err));
       }
     });
   }
 
   private uploadAttachmentsAndSend(mailId: string): void {
-     let completed = 0;
-     this.selectedFiles.forEach(file => {
-       this.attachmentService.uploadAttachment(mailId, file).subscribe({
-         next: () => {
-           completed++;
-           if (completed === this.selectedFiles.length) {
-             this.sendDraft(mailId);
-           }
-         },
-         error: (err) => {
-           console.error('Failed to upload attachment', err);
-           this.isSending = false;
-         }
-       });
-     });
+    let completed = 0;
+    this.selectedFiles.forEach(file => {
+      this.attachmentService.uploadAttachment(mailId, file).subscribe({
+        next: () => {
+          completed++;
+          if (completed === this.selectedFiles.length) {
+            this.sendDraft(mailId);
+          }
+        },
+        error: (err: unknown) => {
+          this.isSending = false;
+          this.showError('Failed to upload attachment', `"${file.name}": ${this.getErrorMessage(err)}`);
+        }
+      });
+    });
   }
 
   private sendDraft(mailId: string): void {
@@ -143,12 +162,13 @@ export class NewMail {
         this.isSending = false;
         this.router.navigate(['/']);
       },
-      error: (err) => {
-        console.error('Failed to send mail', err);
+      error: (err: unknown) => {
         this.isSending = false;
+        this.showError('Failed to send mail', this.getErrorMessage(err));
       }
     });
   }
+
   private updateFileNames(): void {
     this.selectedFileName = this.selectedFiles.map(f => f.name).join(', ');
   }
