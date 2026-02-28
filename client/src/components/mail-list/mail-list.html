@@ -10,6 +10,7 @@
       [subject]="mail.subject"
       [sender]="mail.sender.email"
       [content]="mail.content"
+      [status]="mail.status"
       [isExternal]="mail.source === 'EXTERN'"
       (deleteClicked)="onDelete($event)">
     </app-mail-list-item>

@@ -1,7 +1,7 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
-import {Router, RouterLink} from "@angular/router";
+import {ActivatedRoute, Router, RouterLink} from "@angular/router";
 import {InputField} from '../../components/input-field/input-field';
 import {MatError, MatFormField, MatInput, MatLabel} from '@angular/material/input';
 import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
@@ -37,7 +37,7 @@ import {Dialog} from '../../components/dialog/dialog';
   templateUrl: './new-mail.html',
   styleUrl: './new-mail.css',
 })
-export class NewMail {
+export class NewMail implements OnInit {
   form: FormGroup;
   showCc = false;
   showBcc = false;
@@ -45,12 +45,14 @@ export class NewMail {
   selectedFileName: string = '';
   selectedFiles: File[] = [];
   isSending = false;
+  draftId: string | null = null;
 
   constructor(
     private fb: FormBuilder,
     private mailService: MailService,
     private attachmentService: AttachmentService,
     private router: Router,
+    private route: ActivatedRoute,
     private dialog: MatDialog
   ) {
     this.form = this.fb.group({
@@ -64,6 +66,32 @@ export class NewMail {
     });
   }
 
+  ngOnInit(): void {
+    this.route.queryParamMap.subscribe(params => {
+      const mailId = params.get('id');
+      if (mailId) {
+        this.draftId = mailId;
+        this.mailService.getMailById(mailId).subscribe({
+          next: (draft) => {
+            if (draft.carbonCopy.length > 0) this.showCc = true;
+            if (draft.blindCarbonCopy.length > 0) this.showBcc = true;
+            if (draft.replyTo.length > 0) this.showReplyTo = true;
+
+            this.form.patchValue({
+              to: draft.receiver,
+              cc: draft.carbonCopy,
+              bcc: draft.blindCarbonCopy,
+              replyTo: draft.replyTo,
+              subject: draft.subject,
+              body: draft.content
+            });
+          },
+          error: (err: unknown) => this.showError('Failed to load draft', this.getErrorMessage(err))
+        });
+      }
+    });
+  }
+
   get toControl() { return this.form.get('to') as FormControl; }
   get ccControl() { return this.form.get('cc') as FormControl; }
   get bccControl() { return this.form.get('bcc') as FormControl; }
@@ -73,9 +101,7 @@ export class NewMail {
   get attachmentsControl() { return this.form.get('attachments') as FormControl; }
 
   private showError(title: string, message: string): void {
-    this.dialog.open(Dialog, {
-      data: {title, message}
-    });
+    this.dialog.open(Dialog, {data: {title, message}});
   }
 
   private getErrorMessage(err: unknown): string {
@@ -116,26 +142,49 @@ export class NewMail {
 
     this.isSending = true;
 
-    this.mailService.createMail({
-      subject: this.subjectControl.value,
-      content: this.bodyControl.value,
-      receiver: this.toControl.value,
-      carbonCopy: this.ccControl.value ?? [],
-      blindCarbonCopy: this.bccControl.value ?? [],
-      replyTo: this.replyToControl.value ?? []
-    }).subscribe({
-      next: (draft) => {
-        if (this.selectedFiles.length > 0) {
-          this.uploadAttachmentsAndSend(draft.id);
-        } else {
-          this.sendDraft(draft.id);
+    if (this.draftId) {
+      this.mailService.updateMail(this.draftId, {
+        subject: this.subjectControl.value,
+        content: this.bodyControl.value,
+        receiver: this.toControl.value,
+        carbonCopy: this.ccControl.value ?? [],
+        blindCarbonCopy: this.bccControl.value ?? [],
+        replyTo: this.replyToControl.value ?? []
+      }).subscribe({
+        next: () => {
+          if (this.selectedFiles.length > 0) {
+            this.uploadAttachmentsAndSend(this.draftId!);
+          } else {
+            this.sendDraft(this.draftId!);
+          }
+        },
+        error: (err: unknown) => {
+          this.isSending = false;
+          this.showError('Failed to update mail', this.getErrorMessage(err));
         }
-      },
-      error: (err: unknown) => {
-        this.isSending = false;
-        this.showError('Failed to create mail', this.getErrorMessage(err));
-      }
-    });
+      });
+    } else {
+      this.mailService.createMail({
+        subject: this.subjectControl.value,
+        content: this.bodyControl.value,
+        receiver: this.toControl.value,
+        carbonCopy: this.ccControl.value ?? [],
+        blindCarbonCopy: this.bccControl.value ?? [],
+        replyTo: this.replyToControl.value ?? []
+      }).subscribe({
+        next: (draft) => {
+          if (this.selectedFiles.length > 0) {
+            this.uploadAttachmentsAndSend(draft.id);
+          } else {
+            this.sendDraft(draft.id);
+          }
+        },
+        error: (err: unknown) => {
+          this.isSending = false;
+          this.showError('Failed to create mail', this.getErrorMessage(err));
+        }
+      });
+    }
   }
 
   private uploadAttachmentsAndSend(mailId: string): void {
