@@ -1,13 +1,44 @@
-.mail-list-container{
+.mail-list-container {
   padding: 30px;
 }
 
-.main-header{
+.main-header {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
 }
-mat-paginator{
+
+mat-paginator {
   margin-top: 20px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  color: #999;
+}
+
+.empty-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  color: #ccc;
+  margin-bottom: 20px;
+}
+
+.empty-state h2 {
+  margin: 0 0 10px 0;
+  color: #666;
+  font-size: 20px;
+}
+
+.empty-state p {
+  margin: 0;
+  color: #999;
+  font-size: 14px;
 }

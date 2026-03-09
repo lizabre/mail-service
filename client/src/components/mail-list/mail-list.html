@@ -3,23 +3,31 @@
     <h2>Welcome, {{ user?.firstName }} {{ user?.lastName }}!</h2>
     <a matButton="filled" href="/new-mail">Write an email</a>
   </div>
-  <mat-nav-list>
-    <app-mail-list-item
-      *ngFor="let mail of pagedMails"
-      [id]="mail.id"
-      [subject]="mail.subject"
-      [sender]="mail.sender.email"
-      [content]="mail.content"
-      [status]="mail.status"
-      [isExternal]="mail.source === 'EXTERN'"
-      (deleteClicked)="onDelete($event)">
-    </app-mail-list-item>
-  </mat-nav-list>
-  <mat-paginator
-    [length]="mails.length"
-    [pageSize]="pageSize"
-    [pageSizeOptions]="[5, 10, 20]"
-    (page)="onPageChange($event)"
-    aria-label="Select page">
-  </mat-paginator>
+  <div *ngIf="mails.length === 0" class="empty-state">
+    <mat-icon class="empty-icon">mail_outline</mat-icon>
+    <h2>No mails here</h2>
+    <p>Your {{ folder.toLowerCase() }} folder is empty</p>
+  </div>
+
+  <div *ngIf="mails.length > 0">
+    <mat-nav-list>
+      <app-mail-list-item
+        *ngFor="let mail of pagedMails"
+        [id]="mail.id"
+        [subject]="mail.subject"
+        [sender]="mail.sender.email"
+        [content]="mail.content"
+        [status]="mail.status"
+        [isExternal]="mail.source === 'EXTERN'"
+        (deleteClicked)="onDelete($event)">
+      </app-mail-list-item>
+    </mat-nav-list>
+    <mat-paginator
+      [length]="mails.length"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[5, 10, 20]"
+      (page)="onPageChange($event)"
+      aria-label="Select page">
+    </mat-paginator>
+  </div>
 </div>

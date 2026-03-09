@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
 import {MatIconButton, MatMiniFabButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
@@ -9,6 +9,7 @@ import {MailResponse} from '../../api/mails-service/mails.models';
 import {NgForOf, NgIf} from '@angular/common';
 import {Dialog} from '../../components/dialog/dialog';
 import {MatDialog} from '@angular/material/dialog';
+import {formatDateTime} from '../../utils/formatDateTime';
 
 @Component({
   selector: 'app-mail',
@@ -24,8 +25,14 @@ import {MatDialog} from '@angular/material/dialog';
   templateUrl: './mail.html',
   styleUrl: './mail.css',
 })
-export class Mail implements OnInit {
+export class Mail implements OnInit, OnDestroy {
   mail: MailResponse | null = null;
+  recipients: string[] = [];
+  ccs: string[] = [];
+  bccs: string[] = [];
+  replyto: string[] = [];
+  attachmentUrls = new Map<string, string>();
+
 
   constructor(
     private route: ActivatedRoute,
@@ -34,7 +41,8 @@ export class Mail implements OnInit {
     private attachmentService: AttachmentService,
     private cdr: ChangeDetectorRef,
     private dialog: MatDialog
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     this.route.queryParamMap.subscribe(params => {
@@ -50,6 +58,18 @@ export class Mail implements OnInit {
       }
     });
   }
+  ngOnDestroy(): void {
+    this.attachmentUrls.forEach(url => URL.revokeObjectURL(url));
+  }
+
+  loadAttachment(mailId: string, attachmentId: string): void {
+    if (this.attachmentUrls.has(attachmentId)) return;
+
+    this.attachmentService.getAttachmentContent(mailId, attachmentId).subscribe(url => {
+      this.attachmentUrls.set(attachmentId, url);
+    });
+  }
+
   private showError(title: string, message: string): void {
     this.dialog.open(Dialog, {
       data: {title, message}
@@ -58,7 +78,7 @@ export class Mail implements OnInit {
 
   private getErrorMessage(err: unknown): string {
     if (err && typeof err === 'object' && 'error' in err) {
-      const error = (err as {error: {message?: string, errors?: string}}).error;
+      const error = (err as { error: { message?: string, errors?: string } }).error;
       if (error.message) return error.message;
       if (error.errors) return error.errors;
     }
@@ -87,4 +107,8 @@ export class Mail implements OnInit {
       }
     });
   }
+
+
+
+  protected readonly formatDateTime = formatDateTime;
 }

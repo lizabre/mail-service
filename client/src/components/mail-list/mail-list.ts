@@ -5,11 +5,12 @@ import {User} from '../../api/auth-service/auth.models';
 import {AuthService} from '../../api/auth-service/auth.service';
 import {MatButton} from '@angular/material/button';
 import {MailListItem} from '../mail-list-item/mail-list-item';
-import {NgForOf} from '@angular/common';
+import {NgForOf, NgIf} from '@angular/common';
 import {MailService} from '../../api/mails-service/mails.service';
 import {MailResponse} from '../../api/mails-service/mails.models';
 import {Dialog} from '../dialog/dialog';
 import {MatDialog} from '@angular/material/dialog';
+import {MatIcon} from '@angular/material/icon';
 
 @Component({
   selector: 'app-mail-list',
@@ -19,6 +20,8 @@ import {MatDialog} from '@angular/material/dialog';
     MatButton,
     MailListItem,
     NgForOf,
+    NgIf,
+    MatIcon,
   ],
   templateUrl: './mail-list.html',
   styleUrl: './mail-list.css',
@@ -38,7 +41,8 @@ export class MailList implements OnInit {
     private mailService: MailService,
     private cdr: ChangeDetectorRef,
     private dialog: MatDialog
-  ) {}
+  ) {
+  }
 
   private showError(title: string, message: string): void {
     this.dialog.open(Dialog, {
@@ -48,7 +52,7 @@ export class MailList implements OnInit {
 
   private getErrorMessage(err: unknown): string {
     if (err && typeof err === 'object' && 'error' in err) {
-      const error = (err as {error: {message?: string, errors?: string}}).error;
+      const error = (err as { error: { message?: string, errors?: string } }).error;
       if (error.message) return error.message;
       if (error.errors) return error.errors;
     }
@@ -65,7 +69,6 @@ export class MailList implements OnInit {
 
   loadMails(): void {
     this.mailService.getMails(this.folder).subscribe({
-
       next: (data) => {
         this.mails = data;
         this.updatePagedMails();

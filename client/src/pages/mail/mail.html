@@ -6,7 +6,8 @@
   <div class="mail-header">
     <div>
       <h2>{{ mail.subject }}</h2>
-      <p>{{ mail.sender.firstName }} {{ mail.sender.lastName }} • {{ mail.sender.email }}</p>
+      <p>{{ mail.sender.firstName }} {{ mail.sender.lastName }} • from {{ mail.sender.email }} • to {{mail.receiver}}</p>
+      <p *ngIf="mail.sentAt!==null">sent at {{formatDateTime(mail.sentAt)}}</p>
     </div>
     <button matMiniFab aria-label="Delete mail" (click)="onDelete()">
       <mat-icon>delete</mat-icon>
@@ -22,6 +23,8 @@
       [fileName]="att.fileName"
       [mimeType]="att.mimeType"
       [size]="att.size"
+      [url]="attachmentUrls.get(att.id)??null"
+      (open)="loadAttachment(mail.id, att.id)"
       (deleteClicked)="onDeleteAttachment($event)">
     </app-attachment>
   </div>

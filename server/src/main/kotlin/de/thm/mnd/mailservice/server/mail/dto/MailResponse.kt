@@ -50,3 +50,4 @@ fun Mail.toResponseFor(userId: UUID): MailResponse {
         attachments = this.attachments.map { it.toResponse() }
     )
 }
+fun List<Mail>.toResponseFor(userId: UUID): List<MailResponse> = this.map { it.toResponseFor(userId) }

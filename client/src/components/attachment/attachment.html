@@ -1,4 +1,7 @@
 <div class="attachment-box">
+  <button matIconButton color="primary" (click)="onOpen()">
+     <mat-icon>file_open</mat-icon>
+   </button>
   <span>{{ fileName }}</span>
   <span>{{ formattedSize }}</span>
   <button matButton color="warn" (click)="onDelete()">Delete</button>

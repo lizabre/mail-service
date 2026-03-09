@@ -4,6 +4,7 @@
   height: 100vh;
   padding: 15px;
 }
+
 .back-icon {
   align-self: flex-start;
   margin: 30px 0 5px 0;
@@ -47,4 +48,10 @@
   font-size: 16px;
   width: 16px;
   height: 16px;
+}
+
+.send-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: auto;
 }
