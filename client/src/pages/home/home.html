@@ -1,9 +1,11 @@
 <mat-tab-group>
-  <mat-tab label="All Inbox">
-  <app-mail-list></app-mail-list>
+  <mat-tab label="Inbox">
+    <app-mail-list folder="INBOX"></app-mail-list>
   </mat-tab>
-  <mat-tab label="Received"> <app-mail-list></app-mail-list></mat-tab>
-  <mat-tab label="Sent"> <app-mail-list></app-mail-list></mat-tab>
-  <mat-tab label="Drafts"> <app-mail-list></app-mail-list></mat-tab>
+  <mat-tab label="Sent">
+    <app-mail-list folder="SENT"></app-mail-list>
+  </mat-tab>
+  <mat-tab label="Drafts">
+    <app-mail-list folder="DRAFTS"></app-mail-list>
+  </mat-tab>
 </mat-tab-group>
-

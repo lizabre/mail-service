@@ -1,7 +1,6 @@
 package de.thm.mnd.mailservice.server.attachment.service
 
 import de.thm.mnd.mailservice.server.attachment.domain.Attachment
-import de.thm.mnd.mailservice.server.attachment.dto.AttachmentResponse
 import de.thm.mnd.mailservice.server.attachment.repository.AttachmentRepository
 import de.thm.mnd.mailservice.server.attachment.validation.AttachmentValidator
 import de.thm.mnd.mailservice.server.mail.domain.Mail
@@ -11,7 +10,6 @@ import de.thm.mnd.mailservice.server.user.repository.UserRepository
 import de.thm.mnd.mailservice.server.utils.exceptions.IllegalMailStateException
 import de.thm.mnd.mailservice.server.utils.exceptions.MailAccessDeniedException
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import java.util.UUID
 
@@ -21,8 +19,8 @@ class AttachmentService(
     private val mailRepository: MailRepository,
     private val userRepository: UserRepository,
     private val attachmentValidator: AttachmentValidator
-): AttachmentServiceInterface {
-    override fun getAttachmentMetadata(userId: UUID, mailId: UUID, attachmentId: UUID): AttachmentResponse {
+) : AttachmentServiceInterface {
+    override fun getAttachment(userId: UUID, mailId: UUID, attachmentId: UUID): Attachment {
 
         val user = userRepository.findById(userId)
             .orElseThrow { MailAccessDeniedException("User not found") }
@@ -36,15 +34,10 @@ class AttachmentService(
             .firstOrNull { it.id == attachmentId }
             ?: throw IllegalArgumentException("Attachment not found in this mail")
 
-        return AttachmentResponse(
-            id = attachment.id!!,
-            fileName = attachment.fileName,
-            mimeType = attachment.mimeType,
-            size = attachment.size
-        )
+        return attachment;
     }
 
-    override fun uploadToMail(userId: UUID, mailId: UUID, file: MultipartFile): AttachmentResponse {
+    override fun uploadToMail(userId: UUID, mailId: UUID, file: MultipartFile): Attachment {
         val mail = mailRepository.findById(mailId)
             .orElseThrow { IllegalArgumentException("Mail not found") }
 
@@ -73,12 +66,7 @@ class AttachmentService(
 
         val saved = attachmentRepository.save(attachment)
 
-        return AttachmentResponse(
-            id = saved.id!!,
-            fileName = saved.fileName,
-            mimeType = saved.mimeType,
-            size = saved.size
-        )
+        return saved;
     }
 
     override fun deleteAttachment(userId: UUID, mailId: UUID, attachmentId: UUID) {

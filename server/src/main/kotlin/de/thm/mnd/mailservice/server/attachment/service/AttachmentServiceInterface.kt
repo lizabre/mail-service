@@ -1,11 +1,11 @@
 package de.thm.mnd.mailservice.server.attachment.service
 
-import de.thm.mnd.mailservice.server.attachment.dto.AttachmentResponse
+import de.thm.mnd.mailservice.server.attachment.domain.Attachment
 import org.springframework.web.multipart.MultipartFile
 import java.util.UUID
 
 interface AttachmentServiceInterface {
-    fun getAttachmentMetadata(userId: UUID, mailId: UUID, attachmentId: UUID): AttachmentResponse
-    fun uploadToMail(userId: UUID, mailId: UUID, file: MultipartFile): AttachmentResponse
+    fun getAttachment(userId: UUID, mailId: UUID, attachmentId: UUID): Attachment
+    fun uploadToMail(userId: UUID, mailId: UUID, file: MultipartFile): Attachment
     fun deleteAttachment(userId: UUID, mailId: UUID, attachmentId: UUID)
 }

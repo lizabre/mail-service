@@ -42,7 +42,7 @@ fun Mail.toResponseFor(userId: UUID): MailResponse {
         blindCarbonCopy = if (isSender) this.blindCarbonCopy else emptyList(),
         replyTo = this.replyTo,
         status = this.status,
-        source = this.source,
+        source =  if (isSender) MailSource.INTERN else MailSource.EXTERN,
         createdAt = this.createdAt,
         updatedAt = this.updatedAt,
         sentAt = this.sentAt,
@@ -50,3 +50,4 @@ fun Mail.toResponseFor(userId: UUID): MailResponse {
         attachments = this.attachments.map { it.toResponse() }
     )
 }
+fun List<Mail>.toResponseFor(userId: UUID): List<MailResponse> = this.map { it.toResponseFor(userId) }
