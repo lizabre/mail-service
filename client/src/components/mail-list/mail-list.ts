@@ -12,6 +12,10 @@ import {Dialog} from '../dialog/dialog';
 import {MatDialog} from '@angular/material/dialog';
 import {MatIcon} from '@angular/material/icon';
 
+/**
+ * Component that displays a paginated list of mails for a given folder.
+ * Supports deleting mails and reloading the list.
+ */
 @Component({
   selector: 'app-mail-list',
   imports: [
@@ -41,23 +45,7 @@ export class MailList implements OnInit {
     private mailService: MailService,
     private cdr: ChangeDetectorRef,
     private dialog: MatDialog
-  ) {
-  }
-
-  private showError(title: string, message: string): void {
-    this.dialog.open(Dialog, {
-      data: {title, message}
-    });
-  }
-
-  private getErrorMessage(err: unknown): string {
-    if (err && typeof err === 'object' && 'error' in err) {
-      const error = (err as { error: { message?: string, errors?: string } }).error;
-      if (error.message) return error.message;
-      if (error.errors) return error.errors;
-    }
-    return 'An unexpected error occurred. Please try again.';
-  }
+  ) {}
 
   ngOnInit(): void {
     this.authService.currentUser$.subscribe(user => {
@@ -67,6 +55,7 @@ export class MailList implements OnInit {
     this.loadMails();
   }
 
+  /** Fetches mails for the current folder and updates the paginated view. */
   loadMails(): void {
     this.mailService.getMails(this.folder).subscribe({
       next: (data) => {
@@ -80,6 +69,10 @@ export class MailList implements OnInit {
     });
   }
 
+  /**
+   * Deletes a mail by ID and removes it from the list.
+   * @param mailId The ID of the mail to delete.
+   */
   onDelete(mailId: string): void {
     this.mailService.deleteMail(mailId).subscribe({
       next: () => {
@@ -93,10 +86,27 @@ export class MailList implements OnInit {
     });
   }
 
+  /**
+   * Handles paginator page change events.
+   * @param event The page change event.
+   */
   onPageChange(event: PageEvent): void {
     this.pageIndex = event.pageIndex;
     this.pageSize = event.pageSize;
     this.updatePagedMails();
+  }
+
+  private showError(title: string, message: string): void {
+    this.dialog.open(Dialog, {data: {title, message}});
+  }
+
+  private getErrorMessage(err: unknown): string {
+    if (err && typeof err === 'object' && 'error' in err) {
+      const error = (err as {error: {message?: string, errors?: string}}).error;
+      if (error.message) return error.message;
+      if (error.errors) return error.errors;
+    }
+    return 'An unexpected error occurred. Please try again.';
   }
 
   private updatePagedMails(): void {

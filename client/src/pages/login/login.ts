@@ -7,6 +7,10 @@ import {Router} from '@angular/router';
 import {passwordStrengthValidator} from '../../utils/passwordStrendthValidator';
 import {DialogService} from '../../utils/dialogService';
 
+/**
+ * Page component for user login.
+ * Validates credentials and navigates to home on success.
+ */
 @Component({
   selector: 'app-login',
   imports: [
@@ -28,15 +32,21 @@ export class Login {
     });
   }
 
+  /** Returns the email form control. */
   get emailControl() {
     return this.form.get('email') as FormControl;
   }
 
+  /** Returns the password form control. */
   get passwordControl() {
     return this.form.get('password') as FormControl;
   }
 
-  onSubmit() {
+  /**
+   * Submits the login form.
+   * Navigates to home on success or shows an error dialog on failure.
+   */
+  onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -48,5 +58,4 @@ export class Login {
       error: (err) => {this.dialogService.info({title: 'Login Failed', message: err.error?.errors || 'An error occurred during login. Please try again.'}); console.log(err)}
     });
   }
-
 }

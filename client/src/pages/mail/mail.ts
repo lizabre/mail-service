@@ -11,6 +11,10 @@ import {Dialog} from '../../components/dialog/dialog';
 import {MatDialog} from '@angular/material/dialog';
 import {formatDateTime} from '../../utils/formatDateTime';
 
+/**
+ * Page component for displaying a single mail in detail.
+ * Handles mail deletion, attachment loading and attachment deletion.
+ */
 @Component({
   selector: 'app-mail',
   imports: [
@@ -26,13 +30,11 @@ import {formatDateTime} from '../../utils/formatDateTime';
   styleUrl: './mail.css',
 })
 export class Mail implements OnInit, OnDestroy {
+  /** The currently loaded mail. */
   mail: MailResponse | null = null;
-  recipients: string[] = [];
-  ccs: string[] = [];
-  bccs: string[] = [];
-  replyto: string[] = [];
-  attachmentUrls = new Map<string, string>();
 
+  /** Map of attachment ID to blob object URL for preview/download. */
+  attachmentUrls = new Map<string, string>();
 
   constructor(
     private route: ActivatedRoute,
@@ -41,9 +43,11 @@ export class Mail implements OnInit, OnDestroy {
     private attachmentService: AttachmentService,
     private cdr: ChangeDetectorRef,
     private dialog: MatDialog
-  ) {
-  }
+  ) {}
 
+  /**
+   * Loads the mail by ID from the query params on component init.
+   */
   ngOnInit(): void {
     this.route.queryParamMap.subscribe(params => {
       const mailId = params.get('id');
@@ -53,38 +57,35 @@ export class Mail implements OnInit, OnDestroy {
             this.mail = data;
             this.cdr.detectChanges();
           },
-          error: (err: unknown) => console.error('Failed to load mail', err)
+          error: (err) => this.showError('Failed to load mail', `${this.getErrorMessage(err)}`)
         });
       }
     });
   }
+
+  /**
+   * Revokes all blob object URLs to free memory on component destroy.
+   */
   ngOnDestroy(): void {
     this.attachmentUrls.forEach(url => URL.revokeObjectURL(url));
   }
 
+  /**
+   * Loads the binary content of an attachment and caches the object URL.
+   * Skips loading if the URL is already cached.
+   * @param mailId The ID of the mail.
+   * @param attachmentId The ID of the attachment to load.
+   */
   loadAttachment(mailId: string, attachmentId: string): void {
     if (this.attachmentUrls.has(attachmentId)) return;
-
     this.attachmentService.getAttachmentContent(mailId, attachmentId).subscribe(url => {
       this.attachmentUrls.set(attachmentId, url);
     });
   }
 
-  private showError(title: string, message: string): void {
-    this.dialog.open(Dialog, {
-      data: {title, message}
-    });
-  }
-
-  private getErrorMessage(err: unknown): string {
-    if (err && typeof err === 'object' && 'error' in err) {
-      const error = (err as { error: { message?: string, errors?: string } }).error;
-      if (error.message) return error.message;
-      if (error.errors) return error.errors;
-    }
-    return 'An unexpected error occurred. Please try again.';
-  }
-
+  /**
+   * Deletes the current mail and navigates back to the home page.
+   */
   onDelete(): void {
     if (!this.mail) return;
     this.mailService.deleteMail(this.mail.id).subscribe({
@@ -95,6 +96,10 @@ export class Mail implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Deletes an attachment from the current mail.
+   * @param attachmentId The ID of the attachment to delete.
+   */
   onDeleteAttachment(attachmentId: string): void {
     if (!this.mail) return;
     this.attachmentService.deleteAttachment(this.mail.id, attachmentId).subscribe({
@@ -108,7 +113,28 @@ export class Mail implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Opens an error dialog with the given title and message.
+   * @param title The dialog title.
+   * @param message The error message to display.
+   */
+  private showError(title: string, message: string): void {
+    this.dialog.open(Dialog, {data: {title, message}});
+  }
 
+  /**
+   * Extracts a human-readable error message from an HTTP error response.
+   * @param err The unknown error object.
+   * @returns The error message string.
+   */
+  private getErrorMessage(err: unknown): string {
+    if (err && typeof err === 'object' && 'error' in err) {
+      const error = (err as {error: {message?: string, errors?: string}}).error;
+      if (error.message) return error.message;
+      if (error.errors) return error.errors;
+    }
+    return 'An unexpected error occurred. Please try again.';
+  }
 
   protected readonly formatDateTime = formatDateTime;
 }

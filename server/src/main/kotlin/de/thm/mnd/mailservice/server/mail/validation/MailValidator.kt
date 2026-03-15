@@ -3,6 +3,10 @@ package de.thm.mnd.mailservice.server.mail.validation
 import de.thm.mnd.mailservice.server.mail.domain.Mail
 import org.springframework.stereotype.Component
 
+/**
+ * Validator for mail content before sending.
+ * Ensures all required fields are present and valid.
+ */
 @Component
 class MailValidator {
 

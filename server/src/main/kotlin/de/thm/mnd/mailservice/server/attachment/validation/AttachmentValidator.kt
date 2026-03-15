@@ -3,6 +3,10 @@ package de.thm.mnd.mailservice.server.attachment.validation
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
 
+/**
+ * Validator for mail attachment files.
+ * Checks file size and MIME type constraints.
+ */
 @Component
 class AttachmentValidator {
 

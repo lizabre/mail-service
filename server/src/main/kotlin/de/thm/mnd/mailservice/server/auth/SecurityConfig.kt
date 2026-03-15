@@ -14,13 +14,27 @@ import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
+/**
+ * Security configuration for the application.
+ * Configures JWT authentication, CORS, and request authorization rules.
+ */
 @Configuration
 @EnableWebSecurity
 class SecurityConfig(private val jwtAuthFilter: JwtAuthFilter) {
 
+    /**
+     * Provides a BCrypt password encoder with strength 12.
+     * @return The configured [PasswordEncoder].
+     */
     @Bean
     fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder(12)
 
+    /**
+     * Configures the security filter chain with stateless JWT authentication.
+     * Permits public access to registration and login endpoints only.
+     * @param http The [HttpSecurity] builder.
+     * @return The configured [SecurityFilterChain].
+     */
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain =
         http
@@ -37,6 +51,10 @@ class SecurityConfig(private val jwtAuthFilter: JwtAuthFilter) {
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
             .build()
 
+    /**
+     * Configures CORS to allow requests from the Angular frontend.
+     * @return The configured [CorsConfigurationSource].
+     */
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val config = CorsConfiguration()

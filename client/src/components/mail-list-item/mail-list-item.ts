@@ -5,6 +5,11 @@ import {MatIconButton} from '@angular/material/button';
 import {Router} from '@angular/router';
 import {MailStatus} from '../../api/mails-service/mails.models';
 
+/**
+ * Component representing a single mail item in a list.
+ * Navigates to the mail detail or draft editor on click,
+ * and emits a delete event when the delete button is pressed.
+ */
 @Component({
   selector: 'app-mail-list-item',
   imports: [
@@ -31,6 +36,9 @@ export class MailListItem {
 
   constructor(private router: Router) {}
 
+  /**
+   * Navigates to the draft editor for drafts, or the mail detail view for sent mails.
+   */
   navigateToMail(): void {
     if (this.status === 'DRAFT') {
       this.router.navigate(['/new-mail'], {queryParams: {id: this.id}});
@@ -39,6 +47,10 @@ export class MailListItem {
     }
   }
 
+  /**
+   * Emits the delete event and stops click propagation to prevent navigation.
+   * @param event The mouse click event.
+   */
   onDelete(event: MouseEvent): void {
     event.stopPropagation();
     this.deleteClicked.emit(this.id);

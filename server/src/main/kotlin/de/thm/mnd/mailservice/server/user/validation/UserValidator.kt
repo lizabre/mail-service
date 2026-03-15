@@ -2,6 +2,10 @@ package de.thm.mnd.mailservice.server.user.validation
 
 import org.springframework.stereotype.Component
 
+/**
+ * Validator for user registration and login data.
+ * Enforces email format and password strength requirements.
+ */
 @Component
 class UserValidator {
     fun validateRegistrationData(

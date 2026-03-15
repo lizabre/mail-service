@@ -16,6 +16,16 @@ class UserService(private val userRepository: UserRepository,
                   private val passwordEncoder: PasswordEncoder,
     private val jwtService: JwtService,
     private val userValidator: UserValidator) : UserServiceInterface {
+
+    /**
+     * Registers a new user account and returns a JWT token.
+     * @param firstName The user's first name.
+     * @param lastName The user's last name.
+     * @param email The user's email address.
+     * @param rawPassword The user's plain text password.
+     * @return [UserAuthResult] containing the user and JWT token.
+     * @throws InvalidValidationException if registration data is invalid.
+     */
     override fun registerUser(
         firstName: String,
         lastName: String,
@@ -34,6 +44,14 @@ class UserService(private val userRepository: UserRepository,
         return UserAuthResult(user, token);
     }
 
+    /**
+     * Authenticates a user and returns a JWT token.
+     * @param email The user's email address.
+     * @param rawPassword The user's plain text password.
+     * @return [UserAuthResult] containing the user and JWT token.
+     * @throws InvalidValidationException if login data is invalid.
+     * @throws InvalidLoginCredentials if email or password is incorrect.
+     */
     override fun loginUser(email: String, rawPassword: String): UserAuthResult {
         val errors = userValidator.validateLoginData(email, rawPassword);
         if (errors.isNotEmpty()) {
@@ -53,6 +71,10 @@ class UserService(private val userRepository: UserRepository,
         return true;
     }
 
+    /**
+     * Retrieves all registered users.
+     * @return List of all [User] entities.
+     */
     override fun getAllUsers(): List<User> {
         return userRepository.findAll().toList();
     }
