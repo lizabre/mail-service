@@ -2,6 +2,10 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 
+/**
+ * Component for displaying a single mail attachment.
+ * Supports opening/previewing the file and deleting the attachment.
+ */
 @Component({
   selector: 'app-attachment',
   imports: [
@@ -22,16 +26,24 @@ export class Attachment {
   @Output() deleteClicked = new EventEmitter<string>();
   @Output() open = new EventEmitter<void>();
 
+  /**
+   * Returns the file size formatted as B, KB or MB.
+   */
   get formattedSize(): string {
     if (this.size < 1024) return `${this.size} B`;
     if (this.size < 1024 * 1024) return `${(this.size / 1024).toFixed(1)} KB`;
     return `${(this.size / (1024 * 1024)).toFixed(1)} MB`;
   }
 
+  /** Emits the delete event with the attachment ID. */
   onDelete(): void {
     this.deleteClicked.emit(this.attachmentId);
   }
 
+  /**
+   * Opens the attachment in a new tab if previewable, otherwise triggers a download.
+   * Emits the open event if no URL is available yet.
+   */
   onOpen(): void {
     if (!this.url) { this.open.emit(); return; }
 
