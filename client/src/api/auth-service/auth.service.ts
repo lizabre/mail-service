@@ -4,21 +4,61 @@ import {AuthResponse, LoginRequest, RegisterRequest, User} from './auth.models';
 import {Router} from '@angular/router';
 import {HttpClient} from '@angular/common/http';
 
-@Injectable({ providedIn: 'root' })
+/**
+ * Service for managing user authentication and session state.
+ * Handles login, registration, logout and JWT token persistence.
+ */
+@Injectable({providedIn: 'root'})
 export class AuthService {
   private readonly API_URL = 'http://localhost:8080/api/v1.0/users';
   private readonly TOKEN_KEY = 'access_token';
 
   private accessToken: string | null = null;
-
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
-  isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
-
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(private http: HttpClient, private router: Router) {
-    this.restoreSession(); // <-- add this
+    this.restoreSession();
+  }
+
+  /**
+   * Authenticates a user with email and password.
+   * @param credentials The login request payload.
+   * @returns An observable emitting the {@link AuthResponse}.
+   */
+  login(credentials: LoginRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.API_URL}/login`, credentials).pipe(
+      tap(response => this.handleAuthSuccess(response))
+    );
+  }
+
+  /**
+   * Registers a new user account.
+   * @param data The registration request payload.
+   * @returns An observable emitting the {@link AuthResponse}.
+   */
+  register(data: RegisterRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.API_URL}/register`, data).pipe(
+      tap(response => this.handleAuthSuccess(response))
+    );
+  }
+
+  /**
+   * Returns the current JWT access token.
+   * @returns The token string or null if not authenticated.
+   */
+  getAccessToken(): string | null {
+    return this.accessToken;
+  }
+
+
+  /**
+   * Returns whether the user is currently authenticated.
+   * @returns True if authenticated, false otherwise.
+   */
+  isLoggedIn(): boolean {
+    return this.isAuthenticatedSubject.getValue();
   }
 
   private restoreSession(): void {
@@ -43,45 +83,15 @@ export class AuthService {
     }
   }
 
-  login(credentials: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.API_URL}/login`, credentials).pipe(
-      tap(response => this.handleAuthSuccess(response))
-    );
-  }
-
-  register(data: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.API_URL}/register`, data).pipe(
-      tap(response => this.handleAuthSuccess(response))
-    );
-  }
-
-  logout(): void {
-    this.clearSession();
-    this.router.navigate(['/login']);
-  }
-
-  getAccessToken(): string | null {
-    return this.accessToken;
-  }
-
-  getCurrentUser(): User | null {
-    return this.currentUserSubject.getValue();
-  }
-
-  isLoggedIn(): boolean {
-    return this.isAuthenticatedSubject.getValue();
-  }
-
   private handleAuthSuccess(response: AuthResponse): void {
     this.accessToken = response.token;
-    localStorage.setItem(this.TOKEN_KEY, response.token); // <-- persist it
+    localStorage.setItem(this.TOKEN_KEY, response.token);
     const user: User = {
       id: response.id,
       firstName: response.firstName,
       lastName: response.lastName,
       email: response.email,
     };
-
     localStorage.setItem('user', JSON.stringify(user));
     this.isAuthenticatedSubject.next(true);
     this.currentUserSubject.next(user);

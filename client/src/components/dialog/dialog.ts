@@ -9,6 +9,9 @@ import {
 } from '@angular/material/dialog';
 import {MatButton} from '@angular/material/button';
 
+/**
+ * Reusable dialog component for displaying informational messages and errors.
+ */
 @Component({
   selector: 'app-dialog',
   imports: [
@@ -25,7 +28,7 @@ import {MatButton} from '@angular/material/button';
 export class Dialog {
   constructor(
     public dialogRef: MatDialogRef<Dialog>,
+    /** Injected data containing the dialog title and message. */
     @Inject(MAT_DIALOG_DATA) public data: { title: string; message: string; }
   ) {}
-
 }

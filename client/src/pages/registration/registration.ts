@@ -10,6 +10,11 @@ import {Router} from '@angular/router';
 import {passwordStrengthValidator} from '../../utils/passwordStrendthValidator';
 import {DialogService} from '../../utils/dialogService';
 
+/**
+ * Page component for user registration.
+ * Validates all fields including password strength and match,
+ * then registers the user and navigates to home on success.
+ */
 @Component({
   selector: 'app-registration',
   imports: [InputField, MatButton, ReactiveFormsModule, MatError, NgIf],
@@ -34,6 +39,11 @@ export class Registration {
   get emailControl() { return this.form.get('email') as FormControl; }
   get passwordControl() { return this.form.get('password') as FormControl; }
   get confirmPasswordControl() { return this.form.get('confirmPassword') as FormControl; }
+
+  /**
+   * Submits the registration form.
+   * Navigates to home on success or shows an error dialog on failure.
+   */
   onSubmit() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();

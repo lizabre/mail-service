@@ -18,11 +18,23 @@ import java.util.UUID
 @RestController
 @RequestMapping("/api/v1.0/users")
 class UserController(private val userService: UserService) {
+
+    /**
+     * Registers a new user account.
+     * @param request Registration payload with name, email and password.
+     * @return [UserResponse] containing the JWT token.
+     */
     @PostMapping("/register")
     fun registerUser(@RequestBody request: UserRegisterRequest): UserResponse {
         val userAuthReturn = userService.registerUser(request.firstName, request.lastName, request.email, request.password);
         return userAuthReturn.toUserResponse();
     }
+
+    /**
+     * Authenticates a user and returns a JWT token.
+     * @param request Login payload with email and password.
+     * @return [UserResponse] containing the JWT token.
+     */
     @PostMapping("/login")
     fun loginUser(@RequestBody request: UserLoginRequest): UserResponse {
         val userAuthReturn = userService.loginUser( request.email, request.password);
@@ -33,6 +45,11 @@ class UserController(private val userService: UserService) {
     fun deleteUser(@PathVariable id: UUID): Boolean {
         return userService.deleteUser(id);
     }
+
+    /**
+     * Retrieves all registered users.
+     * @return List of all [User] entities.
+     */
     @GetMapping
     fun getAllUsers(): List<User> {
         return userService.getAllUsers();
