@@ -1,59 +1,50 @@
-# Client
+# mail-service
+Web project for a 'Web Technologies (Bachelor)' course
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.0.
+## Prerequisites
 
-## Development server
+| Tool | Version |
+|------|---------|
+| Java | 21      |
+| Node.js | 22.12   |
 
-To start a local development server, run:
+## Getting Started
 
+### 1. Start the server
 ```bash
-ng serve
+cd server
+link the project with grandle and run the application
 ```
+Server runs on **http://localhost:8080**
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
+### 2. Start the client
 ```bash
-ng generate component component-name
+cd client
+npm install
+npm run start
 ```
+Client runs on **http://localhost:4200**
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Default Credentials
 
-```bash
-ng generate --help
-```
+The application seeds sample data on startup. You can log in with any of the following accounts:
 
-## Building
+| Name | Email | Password |
+|------|-------|----------|
+| Alice Smith | alice@test.com | Password1! |
+| Bob Jones | bob@test.com | Password1! |
+| Carol White | carol@test.com | Password1! |
+| Dave Brown | dave@test.com | Password1! |
 
-To build the project run:
+## Configuration
 
-```bash
-ng build
-```
+No `.env` file is required. All configuration values have defaults built into `application.properties` and the application works out of the box.
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+> **Note:** This is an educational project. Default credentials and secrets are intentionally included for ease of setup and grading.
 
-## Running unit tests
+## Tech Stack
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- **Client:** Angular 2+, TypeScript, Angular Material
+- **Server:** Spring Boot, Kotlin, REST API
+- **Database:** H2 (in-memory), JPA/Hibernate
+- **Auth:** JWT (JSON Web Tokens)
