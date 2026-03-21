@@ -1,5 +1,6 @@
 # mail-service
-Web project for a 'Web Technologies (Bachelor)' course
+Web project for a 'Web Technologies (Bachelor)' course 
+by - Uliana Yeshchenko (5662382) and Yelyzaveta Bredikhina (5662340)
 
 ## Prerequisites
 
