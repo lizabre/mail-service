@@ -13,7 +13,7 @@ Web project for a 'Web Technologies (Bachelor)' course
 ### 1. Start the server
 ```bash
 cd server
-./gradlew bootRun
+link the project with grandle and run the application
 ```
 Server runs on **http://localhost:8080**
 
